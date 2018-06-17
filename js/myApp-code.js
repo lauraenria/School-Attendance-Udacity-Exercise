@@ -8,13 +8,14 @@ model = {
     "Adam the Anaconda"
   ],
 
-  attendance: {}
+  attendance: {},
+
+  numberOfDays: 12
 };
 
 octopus = {
   init: function() {
-    view.init();
-    // createData();
+    view.render(model.numberOfDays);
   },
 
   createData: function() {
@@ -29,15 +30,62 @@ octopus = {
 
 // Student Application
 view = {
-  init: function() {},
+  createBody: function(numberOfDays) {
+    let tbody = document.createElement("tbody");
+    tbody.appendChild(this.createStudentLine(numberOfDays));
+    return tbody;
+  },
 
-  createHeader: function() {
+  createStudentLine: function(numberOfDays) {
+    let tr = document.createElement("tr");
+    tr.classList.add("student");
+    tr.appendChild(this.createName("bobby"));
+    for (let i = 1; i <= numberOfDays; i++) {
+      const dayCheck = this.createCheck(i);
+      tr.appendChild(dayCheck);
+    }
+    return tr;
+  },
+
+  createName: function(textName) {
+    let td = document.createElement("td");
+    td.classList.add("name-col");
+    td.innerText = textName;
+    return td;
+  },
+
+  createCheck: function() {
+    let td = document.createElement("td");
+    td.classList.add("attend-col");
+
+    let input = document.createElement("input");
+    input.setAttribute("type", "checkbox");
+
+    td.appendChild(input);
+    return td;
+  },
+
+  render: function(numberOfDays) {
+    if (model.studends) {
+      let table = document.createElement("table");
+      let tableHeader = viewHeader.createHeader(numberOfDays);
+      table.appendChild(tableHeader);
+
+      let mainDiv = document.querySelector("#attendance-data");
+      mainDiv.appendChild(table);
+      table.appendChild(this.createBody(numberOfDays));
+    }
+  }
+};
+
+viewHeader = {
+  createHeader: function(numberOfDays) {
     let theader = document.createElement("thead");
     let tr = document.createElement("tr");
     let studentName = this.createStudentName();
     theader.appendChild(tr);
     tr.appendChild(studentName);
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= numberOfDays; i++) {
       const dayHeader = this.createDayHeader(i);
       tr.appendChild(dayHeader);
     }
@@ -46,6 +94,16 @@ view = {
     tr.appendChild(missedCol);
 
     return theader;
+  },
+
+  createDayHeader: function(text) {
+    let th = document.createElement("th");
+    th.innerText = text;
+    return th;
+  },
+
+  createMissedCol: function() {
+    return this.createSpecialHeader("missed-col", "Days Missed-col");
   },
 
   createSpecialHeader: function(className, content) {
@@ -57,29 +115,7 @@ view = {
 
   createStudentName: function() {
     return this.createSpecialHeader("name-col", "Student Name");
-  },
-
-  createMissedCol: function() {
-    return this.createSpecialHeader("missed-col", "Days Missed-col");
-  },
-
-  createDayHeader: function(text) {
-    let th = document.createElement("th");
-    th.innerText = text;
-    return th;
-  },
-
-  render: function() {
-    if (model.studends) {
-      let table = document.createElement("table");
-      let tableHeader = this.createHeader();
-      table.appendChild(tableHeader);
-
-      let mainDiv = document.querySelector("#attendance-data");
-      mainDiv.appendChild(table);
-    }
   }
 };
 
-view.render();
 octopus.init();
