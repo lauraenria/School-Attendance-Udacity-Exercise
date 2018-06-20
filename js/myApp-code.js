@@ -8,16 +8,16 @@ model = {
     "Adam the Anaconda"
   ],
 
-  attendance: {
-  },
+  attendance: {},
 
   numberOfDays: 12
 };
 
 octopus = {
   init: function() {
-    view.render(model.numberOfDays);
+    view.render(model.numberOfDays, model.students);
     this.createDataForStudent(model.students);
+    this.addStudent(model.students);
   },
 
   createData: function() {
@@ -29,25 +29,6 @@ octopus = {
     }
   },
 
-  // createDataForStudent: function(){
-  //   let students = model.students;
-  //   let attendance = model.attendance;
-  //   students.forEach( student => {
-  //     attendance[student]
-  //   })
-  //   console.log(model.attendance);
-  // }
-
-  //   createDataForStudent: function(name){
-  //   let attendance = model.attendance;
-  //   return attendance[name] = 0;
-  // }
-
-  // createDataForStudent: function(name){
-  //   Object.assign(model.attendance, name);
-  //   console.log(model.attendance)
-  // }
-
   createDataForStudent: function() {
     let attendance = new Map();
 
@@ -56,22 +37,30 @@ octopus = {
     });
 
     model.attendance = attendance;
-    console.log(model.attendance);
+  },
+
+  addStudent: function(data) {
+    return data;
   }
 };
 
 // Student Application
 view = {
-  createBody: function(numberOfDays) {
+  createBody: function(numberOfDays, students) {
+    console.log(numberOfDays, students);
     let tbody = document.createElement("tbody");
-    tbody.appendChild(this.createStudentLine(numberOfDays));
+
+    students.forEach(student => {
+      tbody.appendChild(this.createStudentLine(numberOfDays, student));
+    });
+
     return tbody;
   },
 
-  createStudentLine: function(numberOfDays) {
+  createStudentLine: function(numberOfDays, student) {
     let tr = document.createElement("tr");
     tr.classList.add("student");
-    tr.appendChild(this.createName("Slappy the Frog"));
+    tr.appendChild(this.createName(student));
     for (let i = 1; i <= numberOfDays; i++) {
       const dayCheck = this.createCheck(i);
       tr.appendChild(dayCheck);
@@ -127,6 +116,7 @@ view = {
           day.className = "attend-col true";
         } else if (day.className === "attend-col true") {
           day.className = "attend-col false";
+          console.log(day, day.className);
         }
       });
     });
@@ -139,7 +129,7 @@ view = {
 
   countMissedDays: function() {},
 
-  render: function(numberOfDays) {
+  render: function(numberOfDays, students) {
     if (model.students) {
       let table = document.createElement("table");
       let tableHeader = viewHeader.createHeader(numberOfDays);
@@ -147,7 +137,7 @@ view = {
 
       let mainDiv = document.querySelector("#attendance-data");
       mainDiv.appendChild(table);
-      table.appendChild(this.createBody(numberOfDays));
+      table.appendChild(this.createBody(numberOfDays, students));
     }
   }
 };
