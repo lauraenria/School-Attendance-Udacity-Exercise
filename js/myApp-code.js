@@ -42,7 +42,6 @@ octopus = {
 // Student Application
 view = {
   createBody: function(numberOfDays, students) {
-
     let tbody = document.createElement("tbody");
 
     students.forEach(student => {
@@ -102,23 +101,24 @@ view = {
 
       // I turn the nodelist element in array and I remove the nameStudend and missedDays colums
       let days = Array.from(student.childNodes).slice(1, -1);
-
       days.forEach(day => {
-        day.addEventListener("click", function() {
-          // fix double class selection
-          let nameStudent = day.parentNode.firstChild.textContent;
-          let missedDays = day.parentNode.lastChild;
+        day.addEventListener("click", function(e) {
+          if (e.target.nodeName  === "INPUT") {
+            // fix double class selection
+            let nameStudent = day.parentNode.firstChild.textContent;
+            let missedDays = day.parentNode.lastChild;
 
-          if (day.className === "attend-col false") {
-            day.className = "attend-col true";
-            attendance[nameStudent] += 1;
-            number = numberOfDays - attendance[nameStudent];
-            missedDays.innerText = number;
-          } else if (day.className === "attend-col true") {
-            day.className = "attend-col false";
-            attendance[nameStudent] -= 1;
-            number = numberOfDays - attendance[nameStudent];
-            missedDays.innerText = number;
+            if (day.className === "attend-col false") {
+              day.className = "attend-col true";
+              attendance[nameStudent] += 1;
+              number = numberOfDays - attendance[nameStudent];
+              missedDays.innerText = number;
+            } else if (day.className === "attend-col true") {
+              day.className = "attend-col false";
+              attendance[nameStudent] -= 1;
+              number = numberOfDays - attendance[nameStudent];
+              missedDays.innerText = number;
+            }
           }
         });
       });
