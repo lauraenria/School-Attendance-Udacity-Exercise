@@ -1,6 +1,6 @@
 // model
 model = {
-  studends: [
+  students: [
     "Slappy the Frog",
     "Lilly the Lizard",
     "Paulrus the Walrus",
@@ -8,7 +8,8 @@ model = {
     "Adam the Anaconda"
   ],
 
-  attendance: {},
+  attendance: {
+  },
 
   numberOfDays: 12
 };
@@ -16,6 +17,7 @@ model = {
 octopus = {
   init: function() {
     view.render(model.numberOfDays);
+    this.createDataForStudent(model.students);
   },
 
   createData: function() {
@@ -25,6 +27,36 @@ octopus = {
         return Math.random() >= 0.5;
       }
     }
+  },
+
+  // createDataForStudent: function(){
+  //   let students = model.students;
+  //   let attendance = model.attendance;
+  //   students.forEach( student => {
+  //     attendance[student]
+  //   })
+  //   console.log(model.attendance);
+  // }
+
+  //   createDataForStudent: function(name){
+  //   let attendance = model.attendance;
+  //   return attendance[name] = 0;
+  // }
+
+  // createDataForStudent: function(name){
+  //   Object.assign(model.attendance, name);
+  //   console.log(model.attendance)
+  // }
+
+  createDataForStudent: function() {
+    let attendance = new Map();
+
+    model.students.forEach(student => {
+      attendance.set(student, 0);
+    });
+
+    model.attendance = attendance;
+    console.log(model.attendance);
   }
 };
 
@@ -39,14 +71,17 @@ view = {
   createStudentLine: function(numberOfDays) {
     let tr = document.createElement("tr");
     tr.classList.add("student");
-    tr.appendChild(this.createName("bobby"));
+    tr.appendChild(this.createName("Slappy the Frog"));
     for (let i = 1; i <= numberOfDays; i++) {
       const dayCheck = this.createCheck(i);
       tr.appendChild(dayCheck);
     }
+
+    tr.appendChild(this.createMissedDays());
     return tr;
   },
 
+  // to refactoring?
   createName: function(textName) {
     let td = document.createElement("td");
     td.classList.add("name-col");
@@ -57,6 +92,7 @@ view = {
   createCheck: function() {
     let td = document.createElement("td");
     td.classList.add("attend-col");
+    td.classList.add("false");
 
     let input = document.createElement("input");
     input.setAttribute("type", "checkbox");
@@ -65,8 +101,46 @@ view = {
     return td;
   },
 
+  // to refactoring?
+  createMissedDays: function(number) {
+    let td = document.createElement("td");
+    td.classList.add("missed-col");
+    td.innerText = number || 0;
+    return td;
+  },
+
+  checkMissedDay: function(attendance) {
+    let student = document.querySelector(".student");
+
+    // // I turn the nodelist element in array and I take the first Element
+    let studentName = Array.from(student.childNodes)[0];
+    // console.log(studentName);
+
+    // I turn the nodelist element in array and I remove the nameStudend and missedDays colums
+    let days = Array.from(student.childNodes).slice(1, -1);
+    days.forEach(day => {
+      day.addEventListener("click", function() {
+        // fix double class selection
+
+        if (day.className === "attend-col false") {
+          console.log(day, day.className);
+          day.className = "attend-col true";
+        } else if (day.className === "attend-col true") {
+          day.className = "attend-col false";
+        }
+      });
+    });
+  },
+
+  createDataForStudent: function() {
+    let students = document.querySelectorAll(".student");
+    let studentName = Array.from(student.childNodes)[0];
+  },
+
+  countMissedDays: function() {},
+
   render: function(numberOfDays) {
-    if (model.studends) {
+    if (model.students) {
       let table = document.createElement("table");
       let tableHeader = viewHeader.createHeader(numberOfDays);
       table.appendChild(tableHeader);
@@ -119,3 +193,4 @@ viewHeader = {
 };
 
 octopus.init();
+view.checkMissedDay(model.attendance);
