@@ -16,8 +16,8 @@ model = {
 octopus = {
   init: function() {
     view.render(model.numberOfDays, model.students);
-    this.createDataForStudent(model.students);
-    this.addStudent(model.students);
+    view.checkMissedDay(model.attendance, model.numberOfDays);
+    this.createDataForStudent(model.students, model.attendance);
   },
 
   createData: function() {
@@ -29,25 +29,20 @@ octopus = {
     }
   },
 
-  createDataForStudent: function() {
-    let attendance = new Map();
+  createDataForStudent: function(array, obj) {
+    const defaultAttendance = array.reduce((acc, curr) => {
+      acc[curr] = 0;
+      return acc;
+    }, obj);
 
-    model.students.forEach(student => {
-      attendance.set(student, 0);
-    });
-
-    model.attendance = attendance;
-  },
-
-  addStudent: function(data) {
-    return data;
+    return defaultAttendance;
   }
 };
 
 // Student Application
 view = {
   createBody: function(numberOfDays, students) {
-    console.log(numberOfDays, students);
+
     let tbody = document.createElement("tbody");
 
     students.forEach(student => {
@@ -66,7 +61,7 @@ view = {
       tr.appendChild(dayCheck);
     }
 
-    tr.appendChild(this.createMissedDays());
+    tr.appendChild(this.createMissedDays(numberOfDays));
     return tr;
   },
 
@@ -94,30 +89,38 @@ view = {
   createMissedDays: function(number) {
     let td = document.createElement("td");
     td.classList.add("missed-col");
-    td.innerText = number || 0;
+    td.innerText = number;
     return td;
   },
 
-  checkMissedDay: function(attendance) {
-    let student = document.querySelector(".student");
+  checkMissedDay: function(attendance, numberOfDays) {
+    let studentsNode = document.querySelectorAll(".student");
 
-    // // I turn the nodelist element in array and I take the first Element
-    let studentName = Array.from(student.childNodes)[0];
-    // console.log(studentName);
+    studentsNode.forEach(student => {
+      // // I turn the nodelist element in array and I take the first Element
+      let studentName = Array.from(student.childNodes)[0];
 
-    // I turn the nodelist element in array and I remove the nameStudend and missedDays colums
-    let days = Array.from(student.childNodes).slice(1, -1);
-    days.forEach(day => {
-      day.addEventListener("click", function() {
-        // fix double class selection
+      // I turn the nodelist element in array and I remove the nameStudend and missedDays colums
+      let days = Array.from(student.childNodes).slice(1, -1);
 
-        if (day.className === "attend-col false") {
-          console.log(day, day.className);
-          day.className = "attend-col true";
-        } else if (day.className === "attend-col true") {
-          day.className = "attend-col false";
-          console.log(day, day.className);
-        }
+      days.forEach(day => {
+        day.addEventListener("click", function() {
+          // fix double class selection
+          let nameStudent = day.parentNode.firstChild.textContent;
+          let missedDays = day.parentNode.lastChild;
+
+          if (day.className === "attend-col false") {
+            day.className = "attend-col true";
+            attendance[nameStudent] += 1;
+            number = numberOfDays - attendance[nameStudent];
+            missedDays.innerText = number;
+          } else if (day.className === "attend-col true") {
+            day.className = "attend-col false";
+            attendance[nameStudent] -= 1;
+            number = numberOfDays - attendance[nameStudent];
+            missedDays.innerText = number;
+          }
+        });
       });
     });
   },
@@ -126,8 +129,6 @@ view = {
     let students = document.querySelectorAll(".student");
     let studentName = Array.from(student.childNodes)[0];
   },
-
-  countMissedDays: function() {},
 
   render: function(numberOfDays, students) {
     if (model.students) {
@@ -183,4 +184,3 @@ viewHeader = {
 };
 
 octopus.init();
-view.checkMissedDay(model.attendance);
