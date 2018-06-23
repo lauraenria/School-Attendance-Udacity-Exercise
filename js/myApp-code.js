@@ -41,9 +41,12 @@ octopus = {
 
 // Student Application
 view = {
+  // This function create a tbody element and I attach to it each student's line (name, radio button, result missing days)
+  // I pass as an argumets the numbers of days and the array of students's names.
   createBody: function(numberOfDays, students) {
     let tbody = document.createElement("tbody");
-
+    // for each name's student in the array I create one line thanks the function createStudentLine()
+    // that takes the numbers of days and one student name.
     students.forEach(student => {
       tbody.appendChild(this.createStudentLine(numberOfDays, student));
     });
@@ -51,6 +54,7 @@ view = {
     return tbody;
   },
 
+  // this function create one student line and use createName(), createCheck() and createMissedDays();
   createStudentLine: function(numberOfDays, student) {
     let tr = document.createElement("tr");
     tr.classList.add("student");
@@ -62,14 +66,6 @@ view = {
 
     tr.appendChild(this.createMissedDays(numberOfDays));
     return tr;
-  },
-
-  // to refactoring?
-  createName: function(textName) {
-    let td = document.createElement("td");
-    td.classList.add("name-col");
-    td.innerText = textName;
-    return td;
   },
 
   createCheck: function() {
@@ -84,12 +80,19 @@ view = {
     return td;
   },
 
-  // to refactoring?
+  createField: function(element, classList, textName) {
+    let field = document.createElement(element);
+    field.classList.add(classList);
+    field.innerText = textName;
+    return field;
+  },
+
+  createName: function(textName) {
+    return this.createField("td", "name-col", textName);
+  },
+
   createMissedDays: function(number) {
-    let td = document.createElement("td");
-    td.classList.add("missed-col");
-    td.innerText = number;
-    return td;
+    return this.createField("td", "missed-col", number);
   },
 
   checkMissedDay: function(attendance, numberOfDays) {
@@ -103,7 +106,7 @@ view = {
       let days = Array.from(student.childNodes).slice(1, -1);
       days.forEach(day => {
         day.addEventListener("click", function(e) {
-          if (e.target.nodeName  === "INPUT") {
+          if (e.target.nodeName === "INPUT") {
             // fix double class selection
             let nameStudent = day.parentNode.firstChild.textContent;
             let missedDays = day.parentNode.lastChild;
@@ -168,18 +171,11 @@ viewHeader = {
   },
 
   createMissedCol: function() {
-    return this.createSpecialHeader("missed-col", "Days Missed-col");
-  },
-
-  createSpecialHeader: function(className, content) {
-    let element = document.createElement("th");
-    element.classList.add(className);
-    element.innerText = content;
-    return element;
+    return view.createField("th", "missed-col", "Days Missed-col");
   },
 
   createStudentName: function() {
-    return this.createSpecialHeader("name-col", "Student Name");
+    return view.createField("th","name-col", "Student Name");
   }
 };
 
